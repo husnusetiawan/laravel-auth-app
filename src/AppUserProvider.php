@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class AppUserProvider implements UserProvider{
 
@@ -82,12 +83,12 @@ class AppUserProvider implements UserProvider{
      */
     public function createToken(Authenticatable $user, array $credentials){
         $token = [
-            "id" => Hash::make(rand(0,1000).time()),
+            "id" => sha1(rand(0,1000).time()),
             "user_id" => $user->id,
             "name" => @$credentials["device"]? $credentials["device"]: "default",
             "ip_address" => Request::ip(),
             "payload" =>  Request::header("user-agent"),
-            "last_activity" => time()
+            "last_activity" => Carbon::now()
         ];
         
         if (DB::table("tokens")->insert($token))

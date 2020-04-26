@@ -35,7 +35,7 @@ class MainTest extends Orchestra\Testbench\TestCase
             "password" => Hash::make('123456')
         ]);
 
-        $token = Hash::make(rand(0,100) . time());
+        $token = sha1(rand(0,100) . time());
 
         DB::table("tokens")->insert([
             "id" => $token,

@@ -9,7 +9,7 @@
   ],
   "require": {
     "php": ">=5.6.0",
-    "illuminate/support": "^5.6"
+    "illuminate/support": "^5.5"
   },
   "autoload": {
     "psr-4": {
@@ -21,6 +21,6 @@
   },
   "minimum-stability": "stable",
   "require-dev": {
-    "orchestra/testbench": "3.6"
+    "orchestra/testbench": "3.5"
   }
 }
