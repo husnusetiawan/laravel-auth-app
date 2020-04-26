@@ -1,0 +1,26 @@
+{
+  "name": "villabs/app-auth",
+  "description": "A simple multiple token based authentication for laravel",
+  "authors": [
+    {
+      "name": "Husnu Setiawan",
+      "email": "husnusetiawan@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.0",
+    "illuminate/support": "^5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Villabs\\AppAuth\\": "src/"
+    }
+  },
+  "scripts": {
+
+  },
+  "minimum-stability": "stable",
+  "require-dev": {
+    "orchestra/testbench": "3.6"
+  }
+}
