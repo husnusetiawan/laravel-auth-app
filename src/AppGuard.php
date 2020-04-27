@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AppGuard implements Guard {
 
@@ -91,13 +92,22 @@ class AppGuard implements Guard {
 
     public function attempt(array $credentials = []){
 
-        if ($this->validate($credentials))
-        {
-            $token = $this->provider->createToken($this->user, $credentials);
-            $this->user->token = $token;
+        $user = $this->provider->retrieveByCredentials($credentials);
+        if (!$user){
+            $this->userNotExistsResponse($this->request);
+            return false;
+        }
+
+        $validated = $this->provider->validateCredentials($user, $credentials);
+        if ($validated){
+            $token = $this->provider->createToken($user, $credentials);
+            $user->token = $token;
+
+            $this->user = $user;
             return true;
         }
 
+        $this->wrongPasswordResponse($this->request);
         return false;
     }
 
@@ -117,5 +127,15 @@ class AppGuard implements Guard {
             return Str::substr($header, 7);
         
         return null;
+    }
+
+    protected function userNotExistsResponse(Request $request)
+    {
+        throw new \Exception(trans('appauth::appauth.user_not_exists'));
+    }
+
+    protected function wrongPasswordResponse(Request $request)
+    {
+        throw new \Exception(trans('auth.failed'));
     }
 }

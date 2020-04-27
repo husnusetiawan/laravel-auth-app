@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class MainTest extends Orchestra\Testbench\TestCase
 {
@@ -20,6 +21,28 @@ class MainTest extends Orchestra\Testbench\TestCase
             "email" => "test",
             "name" => "test",
             "password" => Hash::make('123456')
+        ]);
+        $attempt = Auth::guard("app")->attempt(["email" => "test", "password" =>"123456"]);
+        $this->assertTrue($attempt);
+
+        $this->expectExceptionMessage(trans("auth.failed"));
+        $this->expectException(Exception::class);
+        Auth::guard("app")->attempt(["email" => "test", "password" =>"1234562"]);
+    }
+
+    function testAttemptNotRegisteredYet()
+    {
+        $this->expectExceptionMessage("User have'nt registered yet");
+        $this->expectException(Exception::class);
+        Auth::guard("app")->attempt(["email" => "test2", "password" =>"123456"]);
+    }
+
+    function testAttemptSha1()
+    {
+        DB::table("users")->insert([
+            "email" => "test",
+            "name" => "test",
+            "password" => sha1("123456")
         ]);
         $attempt = Auth::guard("app")->attempt(["email" => "test", "password" =>"123456"]);
         $this->assertTrue($attempt);

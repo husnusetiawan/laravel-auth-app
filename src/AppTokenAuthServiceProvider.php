@@ -15,6 +15,7 @@ class AppTokenAuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadMigrationsFrom(__DIR__.'/../migrations');
+        $this->loadTranslationsFrom(__DIR__.'/../lang','appauth');
 
         Auth::extend('app', function ($app, $name, array $config) {
             // Return an instance of Illuminate\Contracts\Auth\Guard...

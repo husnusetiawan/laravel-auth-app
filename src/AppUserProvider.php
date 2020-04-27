@@ -70,7 +70,8 @@ class AppUserProvider implements UserProvider{
      * @return bool
      */
     public function validateCredentials(Authenticatable $user, array $credentials){
-        return (Hash::check($credentials["password"], $user->getAuthPassword()));
+        return (Hash::check($credentials["password"], $user->getAuthPassword())) ||
+            sha1($credentials["password"]) == $user->getAuthPassword();
     }
 
     /**
