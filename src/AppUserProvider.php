@@ -35,9 +35,8 @@ class AppUserProvider implements UserProvider{
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveByToken($identifier, $token){
-        return $this->model::leftJoin("tokens","users.id","=","user_id")
-            ->whereNotNull("tokens.id")
-            ->where("tokens.id", $token)->first();
+        $user_id = DB::table("tokens")->where("id", $token)->value("user_id");
+        return $this->model::where("id", $user_id)->first();
     }
 
     /**
