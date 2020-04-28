@@ -48,6 +48,27 @@ class MainTest extends Orchestra\Testbench\TestCase
         $this->assertTrue($attempt);
     }
 
+    /**
+     * @depends testAttempt
+     */
+    function testAttemptSameDevice()
+    {
+        DB::table("users")->insert([
+            "email" => "test",
+            "name" => "test",
+            "password" => Hash::make('123456')
+        ]);
+        $attempt = Auth::guard("app")->attempt(["email" => "test", "password" =>"123456"]);
+        $this->assertTrue($attempt);
+        $lastUser = Auth::guard("app")->user();
+
+        // login again
+        Auth::guard("app")->attempt(["email" => "test", "password" =>"123456"]);
+        $user = Auth::guard("app")->user();
+        
+        $this->assertEquals($lastUser->token->id, $user->token->id );
+    }
+
     function testCheck()
     {
 

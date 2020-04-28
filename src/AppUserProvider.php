@@ -58,6 +58,7 @@ class AppUserProvider implements UserProvider{
      */
     public function retrieveByCredentials(array $credentials){
         unset($credentials["password"]);
+        unset($credentials["device"]);
         return $this->model::where($credentials)
             ->first();
     }
@@ -82,18 +83,26 @@ class AppUserProvider implements UserProvider{
      * @return array|null
      */
     public function createToken(Authenticatable $user, array $credentials){
-        $token = [
-            "id" => sha1(rand(0,1000).time()),
-            "user_id" => $user->id,
-            "name" => @$credentials["device"]? $credentials["device"]: "default",
-            "ip_address" => Request::ip(),
-            "payload" =>  Request::header("user-agent"),
-            "last_activity" => Carbon::now()
-        ];
+
+        $device = @$credentials["device"]? $credentials["device"]: "default";
+        $token = DB::table("tokens")
+            ->where("name", $device)
+            ->where("user_id", $user->id)
+            ->first();
+
+        if (!$token){
+            $token = [
+                "id" => sha1(rand(0,1000).time()),
+                "user_id" => $user->id,
+                "name" => $device,
+                "ip_address" => Request::ip(),
+                "payload" =>  Request::header("user-agent"),
+                "last_activity" => Carbon::now()
+            ];
+            DB::table("tokens")->insert($token);
+            $token = (object) $token;
+        }
         
-        if (DB::table("tokens")->insert($token))
-            return $token;
-        
-        return null;
+        return $token;
     }
 }
