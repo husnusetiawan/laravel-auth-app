@@ -6,7 +6,7 @@ use Illuminate\Validation\ValidationException;
 class MainTest extends Orchestra\Testbench\TestCase
 {
 
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
