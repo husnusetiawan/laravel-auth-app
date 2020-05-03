@@ -94,7 +94,6 @@ class AppGuard implements Guard {
 
         $user = $this->provider->retrieveByCredentials($credentials);
         if (!$user){
-            $this->userNotExistsResponse($this->request);
             return false;
         }
 
@@ -107,7 +106,6 @@ class AppGuard implements Guard {
             return true;
         }
 
-        $this->wrongPasswordResponse($this->request);
         return false;
     }
 
@@ -127,15 +125,5 @@ class AppGuard implements Guard {
             return Str::substr($header, 7);
         
         return null;
-    }
-
-    protected function userNotExistsResponse(Request $request)
-    {
-        throw new \Exception(trans('appauth::appauth.user_not_exists'));
-    }
-
-    protected function wrongPasswordResponse(Request $request)
-    {
-        throw new \Exception(trans('auth.failed'));
     }
 }
