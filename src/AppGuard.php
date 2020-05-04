@@ -83,26 +83,18 @@ class AppGuard implements Guard {
         $user = $this->provider->retrieveByCredentials($credentials);
         if (!$user)
             return false;
-        $validated = $this->provider->validateCredentials($user, $credentials);
-        if ($validated)
-            $this->setUser($user);
-        
-        return $validated;
+        return $this->provider->validateCredentials($user, $credentials);
     }
 
     public function attempt(array $credentials = []){
 
         $user = $this->provider->retrieveByCredentials($credentials);
-        if (!$user){
+        if (!$user)
             return false;
-        }
 
         $validated = $this->provider->validateCredentials($user, $credentials);
         if ($validated){
-            $token = $this->provider->createToken($user, $credentials);
-            $user->token = $token;
-
-            $this->user = $user;
+            $this->setUser($user);
             return true;
         }
 
@@ -116,6 +108,8 @@ class AppGuard implements Guard {
      * @return void
      */
     public function setUser(Authenticatable $user){
+        $token = $this->provider->createToken($user, $this->request->input("device"));
+        $user->token = $token;
         $this->user = $user;
     }
 

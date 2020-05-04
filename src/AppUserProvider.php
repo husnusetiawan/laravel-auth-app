@@ -79,12 +79,12 @@ class AppUserProvider implements UserProvider{
      * Create new token for user
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  array  $credentials
+     * @param  string|null $device
      * @return array|null
      */
-    public function createToken(Authenticatable $user, array $credentials){
+    public function createToken(Authenticatable $user, $device){
 
-        $device = @$credentials["device"]? $credentials["device"]: "default";
+        $device = @$device? $device: "default";
         $token = DB::table("tokens")
             ->where("name", $device)
             ->where("user_id", $user->id)

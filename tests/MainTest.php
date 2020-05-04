@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Foundation\Auth\User;
 class MainTest extends Orchestra\Testbench\TestCase
 {
 
@@ -15,6 +15,40 @@ class MainTest extends Orchestra\Testbench\TestCase
         
     }
 
+    function testSetUser()
+    {
+        $user = new User;
+        $user->forceFill([
+            "email" => "test",
+            "name" => "test",
+            "password" => Hash::make('123456')
+        ]);
+        $user->save();
+
+        Auth::guard("app")->setUser($user);
+        $lastUser = Auth::guard("app")->user();
+        $this->assertEquals($lastUser->token->id, $user->token->id );
+
+        // test seconds user
+
+        $user2 = new User;
+        $user2->forceFill([
+            "email" => "test2",
+            "name" => "test",
+            "password" => Hash::make('123456')
+        ]);
+        $user2->save();
+
+        Auth::guard("app")->setUser($user2);
+        $lastUser = Auth::guard("app")->user();
+        $this->assertEquals($lastUser->token->id, $user2->token->id );
+
+    }
+
+
+    /**
+     * @depends testSetUser
+     */
     function testAttempt()
     {
         DB::table("users")->insert([
@@ -112,7 +146,7 @@ class MainTest extends Orchestra\Testbench\TestCase
         ]);
         $app['config']->set('auth.providers.app', [
             'driver' =>  'app',
-            'model' => \Illuminate\Foundation\Auth\User::class
+            'model' => User::class
         ]);
     }
 
