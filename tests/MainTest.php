@@ -124,6 +124,31 @@ class MainTest extends Orchestra\Testbench\TestCase
         $this->assertFalse($check);
     }
 
+    function testLogout(){
+      
+        DB::table("users")->insert([
+            "email" => "test",
+            "name" => "test",
+            "password" => Hash::make('123456')
+        ]);
+        $attempt = Auth::guard("app")->attempt(["email" => "test", "password" =>"123456"]);
+        $this->assertTrue($attempt);
+        
+        $token = Auth::guard("app")->getToken();
+        $request = new Request;
+        $request->headers->set('Authorization', 'Bearer '. $token);
+        Auth::guard("app")->setRequest($request);
+
+        $check = Auth::guard("app")->check();
+        $this->assertTrue($check);
+
+        Auth::guard("app")->logout();
+
+        $check = Auth::guard("app")->check();
+        $this->assertFalse($check);
+
+    }
+
     /**
      * Define environment setup.
      *

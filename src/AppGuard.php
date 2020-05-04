@@ -120,4 +120,14 @@ class AppGuard implements Guard {
         
         return null;
     }
+
+    public function removeToken(string $token){
+        $this->provider->removeToken($token);
+        $this->user = null;
+    }
+
+    public function logout(){
+        $token = $this->getToken();
+        $this->removeToken($token);
+    }
 }

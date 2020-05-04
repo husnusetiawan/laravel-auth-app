@@ -105,4 +105,17 @@ class AppUserProvider implements UserProvider{
         
         return $token;
     }
+    /**
+     * Create new token for user
+     *
+     * @param  string $token
+     * @return void
+     */
+    public function removeToken(String $token){
+
+        DB::table("tokens")
+            ->where("id", $token)
+            ->delete();
+        
+    }
 }
