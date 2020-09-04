@@ -3,6 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Auth\User;
+
+class Admin extends Illuminate\Foundation\Auth\User {
+    protected $table = 'users';
+}
 class MainTest extends Orchestra\Testbench\TestCase
 {
 
@@ -28,10 +32,11 @@ class MainTest extends Orchestra\Testbench\TestCase
         Auth::guard("app")->setUser($user);
         $lastUser = Auth::guard("app")->user();
         $this->assertEquals($lastUser->token->id, $user->token->id );
+        $this->assertEquals($lastUser->token->auth_type, "Illuminate\Foundation\Auth\User" );
 
         // test seconds user
 
-        $user2 = new User;
+        $user2 = new Admin;
         $user2->forceFill([
             "email" => "test2",
             "name" => "test",
@@ -42,6 +47,7 @@ class MainTest extends Orchestra\Testbench\TestCase
         Auth::guard("app")->setUser($user2);
         $lastUser = Auth::guard("app")->user();
         $this->assertEquals($lastUser->token->id, $user2->token->id );
+        $this->assertEquals($lastUser->token->auth_type, "Admin" );
 
     }
 
@@ -108,13 +114,28 @@ class MainTest extends Orchestra\Testbench\TestCase
             "id" => $token,
             "user_id" => 2
         ]);
+
         
         $request = new Request;
         $request->headers->set('Authorization', 'Bearer '. $token);
         Auth::guard("app")->setRequest($request);
         
         $check = Auth::guard("app")->check();
+        $this->assertFalse($check);
+
+        DB::table("tokens")->insert([
+            "id" => $token,
+            "user_id" => 2,
+            "auth_type" => "Admin"
+        ]);
+
+        $request = new Request;
+        $request->headers->set('Authorization', 'Bearer '. $token);
+        Auth::guard("app")->setRequest($request);
+        
+        $check = Auth::guard("app")->check();
         $this->assertTrue($check);
+
 
         $request = new Request;
         $request->headers->set('Authorization', 'Bearer INVALID_TOKEN');
@@ -171,7 +192,7 @@ class MainTest extends Orchestra\Testbench\TestCase
         ]);
         $app['config']->set('auth.providers.app', [
             'driver' =>  'app',
-            'model' => User::class
+            'model' => Admin::class
         ]);
     }
 

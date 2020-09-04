@@ -20,6 +20,7 @@ class CreateTokensTable extends Migration
             $table->string('ip_address',15)->nullable();
             $table->string('payload')->nullable();
             $table->timestamp('last_activity')->nullable();
+            $table->string('auth_type')->default('');
         });
     }
 

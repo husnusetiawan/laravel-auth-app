@@ -35,7 +35,9 @@ class AppUserProvider implements UserProvider{
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveByToken($identifier, $token){
-        $user_id = DB::table("tokens")->where("id", $token)->value("user_id");
+        $user_id = DB::table("tokens")->where("id", $token)
+            ->where("auth_type",$this->model)
+            ->value("user_id");
         return $this->model::where("id", $user_id)->first();
     }
 
@@ -97,7 +99,8 @@ class AppUserProvider implements UserProvider{
                 "name" => $device,
                 "ip_address" => Request::ip(),
                 "payload" =>  Request::header("user-agent"),
-                "last_activity" => Carbon::now()
+                "last_activity" => Carbon::now(),
+                "auth_type" => get_class($user)
             ];
             DB::table("tokens")->insert($token);
             $token = (object) $token;
