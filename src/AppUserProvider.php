@@ -89,6 +89,7 @@ class AppUserProvider implements UserProvider{
         $device = @$device? $device: "default";
         $token = DB::table("tokens")
             ->where("name", $device)
+            ->where("auth_type", get_class($user))
             ->where("user_id", $user->id)
             ->first();
 
